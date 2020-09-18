@@ -70,10 +70,11 @@ const displayController = (() => {
     document.querySelector("main").append(boardElem);
   }
 
-  const player = (player) => {
-    document.querySelector(".player__name").innerHTML = player.name;
-    document.querySelector(".player__mark").innerHTML = player.mark;
-    document.querySelector(".player__score").innerHTML = player.score;
+
+  const player = (player, number) => {
+    document.querySelector(`.player${number} .player__name`).innerHTML = player.name;
+    document.querySelector(`.player${number} .player__mark`).innerHTML = player.mark;
+    document.querySelector(`.player${number} .player__score`).innerHTML = player.winCount;
   }
 
   const _resultElem = document.querySelector(".result");
@@ -141,7 +142,7 @@ const gamePlay = (() => {
 
     const result = _checkRow() || _checkColumn() || _checkDiagonal1() || _checkDiagonal2();
 
-    return { result };
+    return { _checkRow, result };
 
   }
 
@@ -159,8 +160,10 @@ const gamePlay = (() => {
     displayController.tie();
   }
 
-  const gameRound = () => {
-    currentPlayer.play();
+  const gameRound = (event) => {
+    const cells = document.querySelectorAll(".board__cell");
+    currentPlayer.play(gameBoard, event.target.dataset.cell.slice(4));
+    cells[event.target.dataset.cell.slice(4)].innerHTML = currentPlayer.mark;
     _changePlayer(player1, player2);
   }
 
@@ -168,22 +171,13 @@ const gamePlay = (() => {
     
     //Render the empty board and players
       displayController.board(gameBoard.board);
-      displayController.player(player1);
-      displayController.player(player2);
-    
-    //Start the game and continues it until there is a win / tie.
-    while (!checkVictory(gameBoard.board, currentPlayer) && !checkTie(gameBoard.board)) {
-      gameRound();
-    }
+      displayController.player(player1, 1);
+      displayController.player(player2, 2);
 
-    //When there is a win / tie, the game ends.
-    if (checkVictory(gameBoard.board, currentPlayer)) {
-      _win();
-    } else {
-      _tie();
-    }
+    document.querySelector(".board").addEventListener("click", gameRound);
+
   }
-
+    
   return {
     checkVictory,
     checkTie,
@@ -203,4 +197,4 @@ const gameStats = (() => {
   }
 })();
 
-displayController.board(gameBoard.board);
+gamePlay.gameInit();
