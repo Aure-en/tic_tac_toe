@@ -4,7 +4,7 @@ const gameBoard = ((size) => {
 
   const _createBoard = (size) => {
     const board = [];
-    for (let i = 0 ; i < size ; i++) {
+    for (let i = 0 ; i < size*size ; i++) {
       board.push('');
     }
     return board;
@@ -12,11 +12,11 @@ const gameBoard = ((size) => {
 
   const board = _createBoard(size);
 
-  const isEmpty = (cell) => cell == "";
+  const isEmpty = (cell) => board[cell] == "";
 
   const isFull = () => {
-    for (let square of board) {
-      if (square == "") return false;
+    for (let cell of board) {
+      if (cell == "") return false;
     }
     return true;
   }
@@ -37,12 +37,12 @@ const gameBoard = ((size) => {
 
 })(3);
 
-const players = (name, mark) => {
-  const winCount = 0;
+const player = (name, mark) => {
+  let winCount = 0;
 
-  const play = (board, cell) => {
-    if (board.isEmpty(cell)) {
-      board[cell] = mark;
+  const play = (gameBoard, cell) => {
+    if (gameBoard.isEmpty(cell)) {
+      gameBoard.board[cell] = mark;
     }
   }
 
@@ -54,19 +54,56 @@ const players = (name, mark) => {
     winCount,
     play,
     win,
-    lose
   };
-
 }
 
 const displayController = (() => {
+
+  const board = (board) => {
+    
+    let boardElem = document.createElement("div");
+    boardElem.classList.add("board");
+
+    for (let i = 0 ; i < board.length ; i++) {
+      boardElem.innerHTML += `<div class="board__cell" data-cell="cell${i}"></div>`;
+    }
+    document.querySelector("main").append(boardElem);
+  }
+
+  const player = (player) => {
+    document.querySelector(".player__name").innerHTML = player.name;
+    document.querySelector(".player__mark").innerHTML = player.mark;
+    document.querySelector(".player__score").innerHTML = player.score;
+  }
+
+  const _resultElem = document.querySelector(".result");
+
+  const win = (player) => {
+    _resultElem.innerHTML = `${player} won the game.`
+  }
+
+  const tie = () => {
+    _resultElem.innerHTML = `It's a tie!`
+  }
+
+  return {
+    player,
+    board,
+    win,
+    tie
+  }
 
 })();
 
 const gamePlay = (() => {
 
-  const _currentTurn = 1;
-  const currentPlayer = _currentTurn % 2 + 1;
+  const player1 = player("Player1", "x");
+  const player2 = player("Player2", "o");
+  let currentPlayer = player1;
+
+  const _changePlayer = () => {
+    currentPlayer = currentPlayer == player1 ? player2 : player1;
+  }
 
   const checkVictory = (board, player) => {
 
@@ -113,11 +150,47 @@ const gamePlay = (() => {
     return false;
   }
 
+  const _win = () => {
+    currentPlayer.win();
+    displayController.win(currentPlayer);
+  }
+
+  const _tie = () => {
+    displayController.tie();
+  }
+
+  const gameRound = () => {
+    currentPlayer.play();
+    _changePlayer(player1, player2);
+  }
+
+  const gameInit = () => {
+    
+    //Render the empty board and players
+      displayController.board(gameBoard.board);
+      displayController.player(player1);
+      displayController.player(player2);
+    
+    //Start the game and continues it until there is a win / tie.
+    while (!checkVictory(gameBoard.board, currentPlayer) && !checkTie(gameBoard.board)) {
+      gameRound();
+    }
+
+    //When there is a win / tie, the game ends.
+    if (checkVictory(gameBoard.board, currentPlayer)) {
+      _win();
+    } else {
+      _tie();
+    }
+  }
+
   return {
-    currentPlayer,
     checkVictory,
-    checkTie
+    checkTie,
+    gameRound,
+    gameInit
   };
+
 })();
 
 const gameStats = (() => {
@@ -129,3 +202,5 @@ const gameStats = (() => {
     tied
   }
 })();
+
+displayController.board(gameBoard.board);
