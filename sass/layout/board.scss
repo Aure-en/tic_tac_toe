@@ -1,9 +1,14 @@
 .board {
-  display: grid;
-  grid-template: repeat(3, 100px) / repeat(3, 100px);
+  
+  &__row {
+    display: grid;
+    grid-auto-flow: column;
+  }
 
   &__cell {
     border: 1px solid black;
+    height: 100px;
+    width: 100px;
   }
 
 }

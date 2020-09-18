@@ -58,12 +58,14 @@ table {
   justify-content: center;
 }
 
-.board {
+.board__row {
   display: grid;
-  grid-template: repeat(3, 100px)/repeat(3, 100px);
+  grid-auto-flow: column;
 }
 .board__cell {
   border: 1px solid black;
+  height: 100px;
+  width: 100px;
 }
 
 /*# sourceMappingURL=style.css.map */

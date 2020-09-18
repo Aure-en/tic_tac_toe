@@ -4,26 +4,35 @@ const gameBoard = ((size) => {
 
   const _createBoard = (size) => {
     const board = [];
-    for (let i = 0 ; i < size*size ; i++) {
-      board.push('');
+
+    let subBoard = [];
+    for (let i = 0 ; i < size ; i++) {
+      subBoard.push("");
     }
+
+    for (let i = 0 ; i < size ; i++) {
+      board.push(subBoard);
+    }
+
     return board;
   }
 
   const board = _createBoard(size);
 
-  const isEmpty = (cell) => board[cell] == "";
+  const isEmpty = (row, column) => board[row][column] == "";
 
   const isFull = () => {
-    for (let cell of board) {
+    for (let cell of board.flat()) {
       if (cell == "") return false;
     }
     return true;
   }
 
   const reset = () => {
-    for (let cell of board) {
-      cell = "";
+    for (let subBoard of board) {
+      for (let cell of subBoard) {
+        cell = "";
+      }
     }
   }
 
@@ -40,9 +49,9 @@ const gameBoard = ((size) => {
 const player = (name, mark) => {
   let winCount = 0;
 
-  const play = (gameBoard, cell) => {
-    if (gameBoard.isEmpty(cell)) {
-      gameBoard.board[cell] = mark;
+  const play = (gameBoard, row, column) => {
+    if (gameBoard.isEmpty(row, column)) {
+      gameBoard.board[row][column] = mark;
     }
   }
 
@@ -59,15 +68,26 @@ const player = (name, mark) => {
 
 const displayController = (() => {
 
-  const board = (board) => {
+  const board = (gameBoard) => {
     
     let boardElem = document.createElement("div");
     boardElem.classList.add("board");
+    let boardElemHtml = "";
 
-    for (let i = 0 ; i < board.length ; i++) {
-      boardElem.innerHTML += `<div class="board__cell" data-cell="cell${i}"></div>`;
+    for (let row = 0 ; row < gameBoard.size ; row++) {
+      boardElemHtml += `<div class="board__row" data-row="row-${row}">`;
+
+      for (let column = 0 ; column < gameBoard.size ; column++) {
+        boardElemHtml += `<div class="board__cell" data-cell="cell-${row}-${column}"></div>`;
+      }
+
+      boardElemHtml += `</div>`;
+
     }
+
+    boardElem.innerHTML = boardElemHtml;
     document.querySelector("main").append(boardElem);
+
   }
 
 
@@ -101,49 +121,13 @@ const gamePlay = (() => {
   const player1 = player("Player1", "x");
   const player2 = player("Player2", "o");
   let currentPlayer = player1;
+  let latestPlay;
 
   const _changePlayer = () => {
     currentPlayer = currentPlayer == player1 ? player2 : player1;
   }
 
-  const checkVictory = (board, player) => {
-
-    const _checkRow = () => {
-      for (let i = 0 ; i < board.length ; i += Math.sqrt(board.length)) {
-        for (let j = 0 ; j < Math.sqrt(board.length) ; j++) {
-          if (board[i + j] != player.mark) return false;
-        }
-        return true;
-      }
-    }
-
-    const _checkColumn = () => {
-      for (let i = 0 ; i < Math.sqrt(board.length) ; i++) {
-        for (let j = 0 ; j < board.length ; j += Math.sqrt(board.length)) {
-          if (board[i + j] != player.mark) return false;
-        }
-        return true;
-      }
-    }
-
-    const _checkDiagonal1 = () => {
-      for (let i = 0 ; i < board.length ; i += Math.sqrt(board.length) + 1) {
-        if (board[i] != player.mark) return false;
-      }
-      return true;
-    }
-
-    const _checkDiagonal2 = () => {
-      for (let i = Math.sqrt(board.length) - 1 ; i < board.length ; i += Math.sqrt(board.length) - 1) {
-        if (board[i] != player.mark) return false;
-      }
-      return true;
-    }
-
-    const result = _checkRow() || _checkColumn() || _checkDiagonal1() || _checkDiagonal2();
-
-    return { _checkRow, result };
-
+  const checkVictory = (board, player, cell) => {
   }
 
   const checkTie = (board) => {
@@ -161,16 +145,16 @@ const gamePlay = (() => {
   }
 
   const gameRound = (event) => {
-    const cells = document.querySelectorAll(".board__cell");
-    currentPlayer.play(gameBoard, event.target.dataset.cell.slice(4));
-    cells[event.target.dataset.cell.slice(4)].innerHTML = currentPlayer.mark;
+    console.log(`${event.target.dataset.cell.split('-')[1]}-${event.target.dataset.cell.split('-')[2]}`);
+    currentPlayer.play(gameBoard, event.target.dataset.cell.split('-')[1], event.target.dataset.cell.split('-')[2]);
+    document.querySelector(`[data-cell$="${event.target.dataset.cell.split('-')[1]}-${event.target.dataset.cell.split('-')[2]}"`).innerHTML = currentPlayer.mark;
     _changePlayer(player1, player2);
   }
 
   const gameInit = () => {
     
     //Render the empty board and players
-      displayController.board(gameBoard.board);
+      displayController.board(gameBoard);
       displayController.player(player1, 1);
       displayController.player(player2, 2);
 
