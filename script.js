@@ -63,7 +63,7 @@ const displayController = (() => {
 
 })();
 
-const gameFlow = (() => {
+const gamePlay = (() => {
 
   const _currentTurn = 1;
   const currentPlayer = _currentTurn % 2 + 1;
