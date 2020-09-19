@@ -145,6 +145,7 @@ const gamePlay = (() => {
   const player2 = player("Player2", "o");
   let currentPlayer = player1;
   let latestPlay = {};
+  let randomMove;
 
   const gameInit = () => {
     
@@ -182,6 +183,11 @@ const gamePlay = (() => {
     }
 
     _changePlayer(player1, player2);
+
+    if (currentPlayer == player2 && gameSettings.mode == "computer") {
+      randomMove = computer.randomMove(gameBoard.board);
+      document.querySelector(`[data-cell="cell-${randomMove.row}-${randomMove.column}"`).dispatchEvent(new Event("click"));
+    }
 
   }
 
@@ -290,6 +296,56 @@ const gameStats = (() => {
     played,
     tied
   }
+})();
+
+/*gameSettings*/
+
+const gameSettings = (() => {
+
+  const mode = "computer";
+
+  const changeMode = function(mode) {
+    mode = mode == "computer" ? "player" : "computer" ;
+  }
+
+  return {
+    mode,
+    changeMode
+  }
+
+})();
+
+const computer = (() => {
+
+  const randomMove = (board) => {
+
+    let row = Math.floor(Math.random() * board.length);
+    let column = Math.floor(Math.random() * board.length);
+
+    while (board[row][column] != "") {
+      row = Math.floor(Math.random() * board.length);
+      column = Math.floor(Math.random() * board.length);
+    }
+
+    console.log(row, column);
+
+    return { row, column };
+
+  } 
+
+  const bestMove = () => {
+
+  }
+
+  const minimax = () => {
+    
+  }
+
+  return {
+    randomMove
+  }
+
+
 })();
 
 gamePlay.gameInit();
