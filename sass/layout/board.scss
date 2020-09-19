@@ -1,8 +1,7 @@
 .board {
   
   &__row {
-    display: grid;
-    grid-auto-flow: column;
+    display: flex;
   }
 
   &__cell {

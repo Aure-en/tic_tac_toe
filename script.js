@@ -1,5 +1,11 @@
 "use strict"
 
+/*gameBoard Module:
+  - Create the board
+  - Check its state: is it full? Is a cell empty?
+  - Reset the board
+*/
+
 const gameBoard = ((size) => {
 
   const _createBoard = (size) => {
@@ -25,14 +31,11 @@ const gameBoard = ((size) => {
 
   const reset = () => {
     for (let subBoard of board) {
-      for (let cell of subBoard) {
-        cell = "";
-      }
+      subBoard.fill("");
     }
   }
 
   return {
-    size,
     board,
     isEmpty,
     isFull,
@@ -40,6 +43,10 @@ const gameBoard = ((size) => {
   };
 
 })(3);
+
+/*player Factory:
+  - Create the players: give them a name, mark, win count and ability to play.
+*/
 
 const player = (name, mark) => {
 
@@ -60,18 +67,23 @@ const player = (name, mark) => {
   };
 }
 
+/*displayController Module:
+  - Display the board, players, results on the DOM.
+  - Modify the DOM board when a player plays.
+*/
+
 const displayController = (() => {
 
-  const board = (gameBoard) => {
+  const board = (board) => {
     
     let boardElem = document.createElement("div");
     boardElem.classList.add("board");
     let boardElemHtml = "";
 
-    for (let row = 0 ; row < gameBoard.size ; row++) {
+    for (let row = 0 ; row < board.length ; row++) {
       boardElemHtml += `<div class="board__row" data-row="row-${row}">`;
 
-      for (let column = 0 ; column < gameBoard.size ; column++) {
+      for (let column = 0 ; column < board.length ; column++) {
         boardElemHtml += `<div class="board__cell" data-cell="cell-${row}-${column}"></div>`;
       }
 
@@ -90,24 +102,42 @@ const displayController = (() => {
     document.querySelector(`.player${number} .player__score`).innerHTML = player.winCount;
   }
 
+  const play = (player, row, column) => {
+    document.querySelector(`[data-cell$="${row}-${column}"`).innerHTML = player.mark;
+  }
+
   const _resultElem = document.querySelector(".result");
 
-  const win = (player) => {
-    _resultElem.innerHTML = `${player} won the game.`
+  const win = (currentPlayer) => {
+    _resultElem.innerHTML = `${currentPlayer.name} won the game.
+    Click anywhere to start a new game.`
   }
 
   const tie = () => {
-    _resultElem.innerHTML = `It's a tie!`
+    _resultElem.innerHTML = `It's a tie!
+    Click anywhere to start a new game.`
+  }
+
+  const reset = () => {
+    document.querySelectorAll(".board__cell").forEach (cell => cell.innerHTML = "");
   }
 
   return {
     player,
     board,
+    play,
     win,
-    tie
+    tie,
+    reset
   }
 
 })();
+
+/*gamePlay Module (handles the game flow):
+  - Initialize the game (board, players)
+  - Start new rounds until a result is reached.
+  - End the game when a result is reached.
+*/
 
 const gamePlay = (() => {
 
@@ -116,8 +146,15 @@ const gamePlay = (() => {
   let currentPlayer = player1;
   let latestPlay = {};
 
-  const _changePlayer = () => {
-    currentPlayer = currentPlayer == player1 ? player2 : player1;
+  const gameInit = () => {
+    
+    //Render the empty board and players
+      displayController.board(gameBoard.board);
+      displayController.player(player1, 1);
+      displayController.player(player2, 2);
+
+    const cells = document.querySelectorAll(".board__cell");
+    cells.forEach( cell => cell.addEventListener("click", gameRound));
   }
 
   const gameRound = (event) => {
@@ -127,30 +164,59 @@ const gamePlay = (() => {
       column : event.target.dataset.cell.split('-')[2]
     };
 
+    //If the cell chosen is already occupied, nothing is done until the player chooses an empty cell.
+    if (gameBoard.board[latestPlay.row][latestPlay.column] != "") return false;
+
+    //Add the player mark on the board array and displayed board.
     currentPlayer.play(latestPlay.row, latestPlay.column);
-    document.querySelector(`[data-cell$="${latestPlay.row}-${latestPlay.column}"`).innerHTML = currentPlayer.mark;
-    console.log(gameChecks._checkRow(gameBoard.board, latestPlay.row, currentPlayer));
+    displayController.play(currentPlayer, latestPlay.row, latestPlay.column);
+
+    //Checks for a win / tie : if there is one, the game ends.
+    if (gameChecks.checkVictory(gameBoard.board, currentPlayer, latestPlay.row, latestPlay.column)) {
+      _win();
+      _reset();
+    }
+
+    if (gameChecks.checkTie(gameBoard)) {
+      _tie();
+      _reset();
+    }
+
     _changePlayer(player1, player2);
+
   }
 
-  const gameInit = () => {
-    
-    //Render the empty board and players
-      displayController.board(gameBoard);
-      displayController.player(player1, 1);
-      displayController.player(player2, 2);
+  const _changePlayer = () => {
+    currentPlayer = currentPlayer == player1 ? player2 : player1;
+  }
 
-    const cells = document.querySelectorAll(".board__cell");
-    cells.forEach( cell => cell.addEventListener("click", gameRound));
+  const _win = () => {
+    currentPlayer.win();
+    displayController.win(currentPlayer);
+  }
 
+  const _tie = () => {
+    displayController.tie(currentPlayer);
+  }
+
+  const _reset = () => {
+    gameBoard.reset();
+    displayController.reset();
   }
     
   return {
+    player1,
+    player2,
     gameRound,
     gameInit
   };
 
 })();
+
+/*gameChecks Module:
+  - Check if a player won
+  - Check if there is a tie.
+*/
 
 const gameChecks = (() => {
 
@@ -206,25 +272,16 @@ const gameChecks = (() => {
     }
   }
 
-  const _win = () => {
-    currentPlayer.win();
-    displayController.win(currentPlayer);
-  }
-
-  const _tie = () => {
-    displayController.tie();
-  }
-
   return {
     checkTie,
-    checkVictory,
-    _checkRow,
-    _checkColumn,
-    _checkDiagonal,
-    _checkAntiDiagonal
+    checkVictory
   }
 
 })();
+
+/*gameStats Module:
+  - Counts the number of game played / ties
+*/
 
 const gameStats = (() => {
   const played = 0;

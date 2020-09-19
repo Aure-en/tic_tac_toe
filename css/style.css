@@ -59,8 +59,7 @@ table {
 }
 
 .board__row {
-  display: grid;
-  grid-auto-flow: column;
+  display: flex;
 }
 .board__cell {
   border: 1px solid black;
