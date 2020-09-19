@@ -5,13 +5,8 @@ const gameBoard = ((size) => {
   const _createBoard = (size) => {
     const board = [];
 
-    let subBoard = [];
     for (let i = 0 ; i < size ; i++) {
-      subBoard.push("");
-    }
-
-    for (let i = 0 ; i < size ; i++) {
-      board.push(subBoard);
+      board.push(Array(size).fill(""));
     }
 
     return board;
@@ -47,12 +42,11 @@ const gameBoard = ((size) => {
 })(3);
 
 const player = (name, mark) => {
+
   let winCount = 0;
 
   const play = (row, column) => {
-    if (gameBoard.isEmpty(row, column)) {
       gameBoard.board[row][column] = mark;
-    }
   }
 
   const win = () => ++winCount;
@@ -134,9 +128,7 @@ const gamePlay = (() => {
     };
 
     currentPlayer.play(latestPlay.row, latestPlay.column);
-    console.log(gameBoard.board);
     document.querySelector(`[data-cell$="${latestPlay.row}-${latestPlay.column}"`).innerHTML = currentPlayer.mark;
-    console.log(currentPlayer);
     console.log(gameChecks._checkRow(gameBoard.board, latestPlay.row, currentPlayer));
     _changePlayer(player1, player2);
   }
@@ -148,8 +140,8 @@ const gamePlay = (() => {
       displayController.player(player1, 1);
       displayController.player(player2, 2);
 
-    //Allows the players to click on the board to play the game.  
-    document.querySelector(".board").addEventListener("click", gameRound);
+    const cells = document.querySelectorAll(".board__cell");
+    cells.forEach( cell => cell.addEventListener("click", gameRound));
 
   }
     
@@ -163,29 +155,29 @@ const gamePlay = (() => {
 const gameChecks = (() => {
 
   const _checkRow = (board, row, player) => {
-    for (let column = 0 ; column < Math.sqrt(board.length) ; column++) {
+    for (let column = 0 ; column < board.length ; column++) {
       if (board[row][column] != player.mark) return false;
     }
     return true;
   }
 
   const _checkColumn = (board, column, player) => {
-    for (let row = 0 ; row < Math.sqrt(board.length) ; row++) {
+    for (let row = 0 ; row < board.length ; row++) {
       if (board[row][column] != player.mark) return false;
     }
     return true;
   }
 
   const _checkDiagonal = (board, player) => {
-    for (let index = 0 ; index < Math.sqrt(board.length) ; index++) {
+    for (let index = 0 ; index < board.length ; index++) {
       if (board[index][index] != player.mark) return false;
     }
     return true;
   }
 
   const _checkAntiDiagonal = (board, player) => {
-    for (let index = 0 ; index < Math.sqrt(board.length) ; index++) {
-        if (board[index][Math.sqrt(board.length) - 1 - index] != player.mark) return false;
+    for (let index = 0 ; index < board.length ; index++) {
+        if (board[index][board.length - 1 - index] != player.mark) return false;
       }
     return true;
   }
@@ -197,7 +189,7 @@ const gameChecks = (() => {
 
   const checkVictory = (board, player, row, column) => {
 
-    if (row == column && row == Math.sqrt(board.length) - 1 - column) {
+    if (row == column && row == board.length - 1 - column) {
       return _checkDiagonal(board, player) || _checkAntiDiagonal(board, player) || _checkRow(board, row, player) || _checkColumn(board, column, player);
     }
 
@@ -205,7 +197,7 @@ const gameChecks = (() => {
       return _checkDiagonal(board, player) || _checkRow(board, row, player) || _checkColumn(board, column, player);
     }
 
-    else if (row == Math.sqrt(board.length) - 1 - column) {
+    else if (row == board.length - 1 - column) {
       return _checkAntiDiagonal(board, player) || _checkRow(board, row, player) || _checkColumn(board, column, player);
     }
 
