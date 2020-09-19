@@ -50,18 +50,18 @@ const gameBoard = ((size) => {
 
 const player = (name, mark) => {
 
-  let winCount = 0;
+  let score = 0;
 
   const play = (row, column) => {
       gameBoard.board[row][column] = mark;
   }
 
-  const win = () => ++winCount;
+  const win = function() { ++score };
 
   return {
     name,
     mark,
-    winCount,
+    score,
     play,
     win,
   };
@@ -99,7 +99,7 @@ const displayController = (() => {
   const player = (player, number) => {
     document.querySelector(`.player${number} .player__name`).innerHTML = player.name;
     document.querySelector(`.player${number} .player__mark`).innerHTML = player.mark;
-    document.querySelector(`.player${number} .player__score`).innerHTML = player.winCount;
+    document.querySelector(`.player${number} .player__score`).innerHTML = player.score;
   }
 
   const play = (player, row, column) => {
@@ -155,6 +155,7 @@ const gamePlay = (() => {
 
     const cells = document.querySelectorAll(".board__cell");
     cells.forEach( cell => cell.addEventListener("click", gameRound));
+    document.querySelector(".reset").addEventListener("click", _reset);
   }
 
   const gameRound = (event) => {
@@ -174,12 +175,10 @@ const gamePlay = (() => {
     //Checks for a win / tie : if there is one, the game ends.
     if (gameChecks.checkVictory(gameBoard.board, currentPlayer, latestPlay.row, latestPlay.column)) {
       _win();
-      _reset();
     }
 
     if (gameChecks.checkTie(gameBoard)) {
       _tie();
-      _reset();
     }
 
     _changePlayer(player1, player2);
@@ -288,7 +287,7 @@ const gameStats = (() => {
   const tied = 0;
 
   return {
-    player,
+    played,
     tied
   }
 })();
