@@ -146,6 +146,7 @@ const gamePlay = (() => {
   let currentPlayer = player1;
   let latestPlay = {};
   let randomMove;
+  let bestMove;
 
   const gameInit = () => {
     
@@ -174,7 +175,7 @@ const gamePlay = (() => {
     displayController.play(currentPlayer, latestPlay.row, latestPlay.column);
 
     //Checks for a win / tie : if there is one, the game ends.
-    if (gameChecks.checkVictory(gameBoard.board, currentPlayer, latestPlay.row, latestPlay.column)) {
+    if (gameChecks.checkVictory(gameBoard.board, currentPlayer)) {
       _win();
     }
 
@@ -185,8 +186,12 @@ const gamePlay = (() => {
     _changePlayer(player1, player2);
 
     if (currentPlayer == player2 && gameSettings.mode == "computer") {
-      randomMove = computer.randomMove(gameBoard.board);
-      document.querySelector(`[data-cell="cell-${randomMove.row}-${randomMove.column}"`).dispatchEvent(new Event("click"));
+      // randomMove = computer.randomMove(gameBoard.board);
+      // document.querySelector(`[data-cell="cell-${randomMove.row}-${randomMove.column}"`).dispatchEvent(new Event("click"));
+
+      bestMove = computer.bestMove(gameBoard.board);
+      document.querySelector(`[data-cell="cell-${bestMove.row}-${bestMove.column}"`).dispatchEvent(new Event("click"));
+
     }
 
   }
@@ -225,18 +230,32 @@ const gamePlay = (() => {
 
 const gameChecks = (() => {
 
-  const _checkRow = (board, row, player) => {
-    for (let column = 0 ; column < board.length ; column++) {
-      if (board[row][column] != player.mark) return false;
+  const _checkRow = (board, player) => {
+
+    let count = 0;
+
+    for (let row = 0 ; row < board.length ; row++) {
+      for (let column = 0 ; column < board.length ; column++) {
+        if (board[row][column] == player.mark) count++;
+        if (count == board.length) return true;
+      }
+      count = 0;
     }
-    return true;
+    return false;
   }
 
-  const _checkColumn = (board, column, player) => {
-    for (let row = 0 ; row < board.length ; row++) {
-      if (board[row][column] != player.mark) return false;
+  const _checkColumn = (board, player) => {
+
+    let count = 0;
+
+    for (let column = 0 ; column < board.length ; column++) {
+      for (let row = 0 ; row < board.length ; row++) {
+        if (board[row][column] == player.mark) count++;
+        if (count == board.length) return true;
+      }
+      count = 0;
     }
-    return true;
+    return false;
   }
 
   const _checkDiagonal = (board, player) => {
@@ -258,23 +277,8 @@ const gameChecks = (() => {
     return false;
   }
 
-  const checkVictory = (board, player, row, column) => {
-
-    if (row == column && row == board.length - 1 - column) {
-      return _checkDiagonal(board, player) || _checkAntiDiagonal(board, player) || _checkRow(board, row, player) || _checkColumn(board, column, player);
-    }
-
-    else if (row == column) {
-      return _checkDiagonal(board, player) || _checkRow(board, row, player) || _checkColumn(board, column, player);
-    }
-
-    else if (row == board.length - 1 - column) {
-      return _checkAntiDiagonal(board, player) || _checkRow(board, row, player) || _checkColumn(board, column, player);
-    }
-
-    else {
-      return _checkRow(board, row, player) || _checkColumn(board, column, player);
-    }
+  const checkVictory = (board, player) => {
+    return _checkDiagonal(board, player) || _checkAntiDiagonal(board, player) || _checkRow(board, player) || _checkColumn(board, player);
   }
 
   return {
@@ -315,7 +319,24 @@ const gameSettings = (() => {
 
 })();
 
+/*computer Module :
+  - Initialize the AI levels
+*/
+
 const computer = (() => {
+
+  const _availableSpots = (board) => {
+    let available = [];
+
+    for (let i = 0 ; i < board.length ; i++) {
+      for (let j = 0 ; j < board.length ; j++) {
+        if (board[i][j] == "") available.push({ row: i, column: j});
+      }
+    }
+
+    return available;
+
+  }
 
   const randomMove = (board) => {
 
@@ -327,22 +348,77 @@ const computer = (() => {
       column = Math.floor(Math.random() * board.length);
     }
 
-    console.log(row, column);
-
     return { row, column };
 
   } 
 
-  const bestMove = () => {
+  const bestMove = (board) => {
+
+    return minimax(gameBoard.board, gamePlay.player2);
 
   }
 
-  const minimax = () => {
-    
+  const minimax = (board, player) => {
+
+    //The board is full or someone won : the evaluation is returned.
+
+    if (gameChecks.checkVictory(board, gamePlay.player1)) return { score : -1 };
+    if (gameChecks.checkVictory(board, gamePlay.player2)) return { score : 1 };
+    if (_availableSpots(board).length == 0) return { score : 0 };
+
+    //Array collecting all the possible moves and their respective score.
+    let moves = [];
+
+    for (let spot of _availableSpots(board)) {
+      let move = {};
+      move.row = spot.row;
+      move.column = spot.column;
+
+      board[spot.row][spot.column] = player.mark;
+
+      if (player == gamePlay.player2) {
+        let result = minimax(board, gamePlay.player1);
+        move.score = result.score;
+      } else {
+        let result = minimax(board, gamePlay.player2);
+        move.score = result.score;
+      }
+
+      board[spot.row][spot.column] = "";
+      moves.push(move);
+    }
+
+    let bestMove;
+
+    if (player == gamePlay.player2) {
+      let maxEval = -Infinity;
+
+      for (let i = 0 ; i < moves.length ; i++) {
+        if (moves[i].score > maxEval) {
+          maxEval = moves[i].score;
+          bestMove = i;
+        }
+      }
+
+    } else {
+      let minEval = +Infinity;
+
+      for (let i = 0 ; i < moves.length ; i++) {
+        if (moves[i].score < minEval) {
+          minEval = moves[i].score;
+          bestMove = i;
+        }
+      }
+    }
+
+    return moves[bestMove];
+
   }
 
   return {
-    randomMove
+    randomMove,
+    bestMove,
+    minimax
   }
 
 
