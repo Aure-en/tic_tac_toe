@@ -149,8 +149,6 @@ const gamePlay = (() => {
     
     //Render the empty board and players
       displayController.board(gameBoard.board);
-      displayController.player(player1, 1);
-      displayController.player(player2, 2);
 
     const cells = document.querySelectorAll(".board__cell");
     cells.forEach( cell => cell.addEventListener("click", gameRound));

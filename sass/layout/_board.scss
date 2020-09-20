@@ -1,0 +1,25 @@
+.board {
+
+  width: 70vh;
+  height: 70vh;
+  display: flex;
+  flex-direction: column;
+  background: $color-secondary;
+  border-right: none;
+  border-top: none;
+  
+  &__row {
+    display: flex;
+    flex: 1;
+  }
+
+  &__cell {
+    flex: 1;
+    border-right: 1px solid $color-primary;
+    border-top: 1px solid $color-primary;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+}

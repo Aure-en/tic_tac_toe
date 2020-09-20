@@ -7,6 +7,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400&display=swap" rel="stylesheet">
   <script defer src="script.js"></script>
 </head>
 
@@ -15,15 +16,15 @@
   <div class="wrapper">
 
     <aside class="player player1">
-      <h2 class="player__title">Player 1</h2>
+      <h2 class="player__title">PLAYER 1</h2>
 
-      <div class="player__stats">
+      <div class="player__stats player__stats--1 box">
         <ul>
-          <li class="player__name"><span class="stats">NAME:</span> POTATO</li>
+          <li class="player__name"><span class="stats">NAME:</span> Potato</li>
           <li class="player__mark"><span class="stats">MARK:</span> X</li>
-          <li class="player__score"><span class="stats">PLAYED:</span> 10 GAMES</li>
-          <li class="player__rate"><span class="stats">WON:</span> 5 GAMES</li>
-          <li class="player__rate"><span class="stats">LOST:</span> 5 GAMES</li>
+          <li class="player__score"><span class="stats">PLAYED:</span> 10 games</li>
+          <li class="player__rate"><span class="stats">WON:</span> 5 games</li>
+          <li class="player__rate"><span class="stats">LOST:</span> 5 games</li>
         </ul>
       </div>
 
@@ -31,15 +32,14 @@
 
     <main class="game">
 
-      <div class="board"></div>
-      <div class="result"></div>
+      <div class="board box"></div>
 
     </main>
 
     <aside class="player player2">
-      <h2 class="player__title">Player 2</h2>
+      <h2 class="player__title">PLAYER 2</h2>
 
-      <div class="player__stats">
+      <div class="player__stats player__stats--2 box">
         <ul>
           <li class="player__name"><span class="stats">NAME:</span> POTATO2</li>
           <li class="player__mark"><span class="stats">MARK:</span> O</li>
@@ -51,6 +51,7 @@
 
     </aside>
 
+    <div class="result"></div>
     <button type="button" class="btn reset">Reset</button>
 
   </div>

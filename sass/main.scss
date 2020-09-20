@@ -1,4 +1,6 @@
-@import "../sass/base/base.scss";
-@import "../sass/base/typography.scss";
-@import "../sass/layout/board.scss";
-@import "../sass/layout/player.scss";
+@import "../sass/utils/variables";
+@import "../sass/base/base";
+@import "../sass/base/typography";
+@import "../sass/components/box";
+@import "../sass/layout/board";
+@import "../sass/layout/player";

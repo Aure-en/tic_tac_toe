@@ -1,0 +1,41 @@
+.player {
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+
+  &__title {
+    color: $color-secondary;
+    background: lighten($color-primary, 5%);
+    padding: .55rem 1.25rem;
+    border: 1px solid $color-secondary;
+    border-radius: $border-radius;
+    position: relative;
+    top: 1rem;
+    z-index: 1;
+  }
+
+  &__stats {
+
+    width: 25vh;
+    height: 35vh;
+    background-size: cover;
+    position: relative;
+    opacity: 0.7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 2rem;
+    box-shadow: 3px 3px 1px $color-secondary, -3px -3px 1px $color-secondary, 3px -3px 1px $color-secondary, -3px 3px 1px $color-secondary;
+
+    &--1 {
+      background-image: url("../sass/assets/player1.png");
+    }
+
+    &--2 {
+      background-image: url("../sass/assets/player2.png");
+    }
+  }
+
+}
