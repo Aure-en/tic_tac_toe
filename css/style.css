@@ -52,19 +52,57 @@ table {
   border-spacing: 0;
 }
 
-.wrapper {
+* {
+  box-sizing: border-box;
+}
+
+body {
+  width: 100vw;
+  height: 100vh;
+  max-width: 100%;
+  max-height: 100%;
+  background: url("../sass/assets/background.png");
+  background-repeat: no-repeat;
+  background-size: cover;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
+.wrapper {
+  display: flex;
+  align-items: flex-end;
+}
+
+.board {
+  width: 70vh;
+  height: 70vh;
+  display: flex;
+  flex-direction: column;
+}
 .board__row {
   display: flex;
+  flex: 1;
 }
 .board__cell {
-  border: 1px solid black;
-  height: 100px;
-  width: 100px;
+  flex: 1;
+  border: 1px solid red;
+}
+
+.player__stats {
+  width: 25vh;
+  height: 35vh;
+  border: 1px solid blue;
+  border-radius: 15px;
+  background: url("../sass/assets/aside1.png");
+  background-size: cover;
+}
+.player__stats::before {
+  display: block;
+  content: "";
+  background: rgba(255, 255, 255, 0.5);
+  width: 100%;
+  height: 100%;
 }
 
 /*# sourceMappingURL=style.css.map */

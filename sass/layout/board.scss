@@ -1,13 +1,18 @@
 .board {
+
+  width: 70vh;
+  height: 70vh;
+  display: flex;
+  flex-direction: column;
   
   &__row {
     display: flex;
+    flex: 1;
   }
 
   &__cell {
-    border: 1px solid black;
-    height: 100px;
-    width: 100px;
+    flex: 1;
+    border: 1px solid red;
   }
 
 }

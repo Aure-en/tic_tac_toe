@@ -76,8 +76,6 @@ const displayController = (() => {
 
   const board = (board) => {
     
-    let boardElem = document.createElement("div");
-    boardElem.classList.add("board");
     let boardElemHtml = "";
 
     for (let row = 0 ; row < board.length ; row++) {
@@ -91,8 +89,7 @@ const displayController = (() => {
 
     }
 
-    boardElem.innerHTML = boardElemHtml;
-    document.querySelector("main").append(boardElem);
+    document.querySelector(".board").innerHTML = boardElemHtml;
 
   }
 
@@ -302,7 +299,10 @@ const gameStats = (() => {
   }
 })();
 
-/*gameSettings*/
+/*gameSettings:
+  - Change the number of players (1 or 2?)
+  - Change the computer difficulty (easy or hard)
+*/
 
 const gameSettings = (() => {
 
@@ -354,16 +354,16 @@ const computer = (() => {
 
   const bestMove = (board) => {
 
-    return minimax(gameBoard.board, gamePlay.player2);
+    return _minimax(gameBoard.board, gamePlay.player2);
 
   }
 
-  const minimax = (board, player) => {
+  const _minimax = (board, player) => {
 
     //The board is full or someone won : the evaluation is returned.
 
-    if (gameChecks.checkVictory(board, gamePlay.player1)) return { score : -1 };
-    if (gameChecks.checkVictory(board, gamePlay.player2)) return { score : 1 };
+    if (gameChecks.checkVictory(board, gamePlay.player1)) return { score : -10 - _availableSpots(board).length };
+    if (gameChecks.checkVictory(board, gamePlay.player2)) return { score : 10 + _availableSpots(board).length };
     if (_availableSpots(board).length == 0) return { score : 0 };
 
     //Array collecting all the possible moves and their respective score.
@@ -377,10 +377,10 @@ const computer = (() => {
       board[spot.row][spot.column] = player.mark;
 
       if (player == gamePlay.player2) {
-        let result = minimax(board, gamePlay.player1);
+        let result = _minimax(board, gamePlay.player1);
         move.score = result.score;
       } else {
-        let result = minimax(board, gamePlay.player2);
+        let result = _minimax(board, gamePlay.player2);
         move.score = result.score;
       }
 
@@ -417,8 +417,7 @@ const computer = (() => {
 
   return {
     randomMove,
-    bestMove,
-    minimax
+    bestMove
   }
 
 
