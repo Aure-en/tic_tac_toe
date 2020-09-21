@@ -37,12 +37,18 @@
   background-repeat: no-repeat;
   background-position: center;
 
+  &--hover--x {
+    background-image: url('../sass/assets/X.png');
+    opacity: 0.2;
+  }
+
   &--x {
     background-image: url('../sass/assets/X.png');
+    opacity: 1;
   }
 
   &--o {
     background-image: url('../sass/assets/O.png');
+    opacity: 1;
   }
-
 }

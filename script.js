@@ -1,12 +1,12 @@
 "use strict"
 
-/*gameBoard Module:
+/*gameBoard Factory:
   - Create the board
   - Check its state: is it full? Is a cell empty?
   - Reset the board
 */
 
-const gameBoard = ((size) => {
+const gameBoard = (size) => {
 
   const _createBoard = (size) => {
     const board = [];
@@ -42,7 +42,7 @@ const gameBoard = ((size) => {
     reset
   };
 
-})(3);
+};
 
 /*player Factory:
   - Create the players: give them a name, mark, win count and ability to play.
@@ -51,12 +51,18 @@ const gameBoard = ((size) => {
 const player = (name, mark) => {
 
   let score = 0;
+  let played = 0;
 
-  const play = (row, column) => {
-      gameBoard.board[row][column] = mark;
+  const play = (board, row, column) => {
+      board[row][column] = mark;
   }
 
   const win = function() { ++score };
+  const incPlay = function () { ++played };
+
+  const setName = function(name) {
+    this.name = name;
+  }
 
   return {
     name,
@@ -64,17 +70,21 @@ const player = (name, mark) => {
     score,
     play,
     win,
+    played,
+    incPlay,
+    setName
   };
 }
 
 /*displayController Module:
+  - Setups the buttons
   - Display the board, players, results on the DOM.
   - Modify the DOM board when a player plays.
 */
 
 const displayController = (() => {
 
-  const board = (board) => {
+  const setBoard = (board) => {
     
     let boardElemHtml = "";
 
@@ -93,15 +103,44 @@ const displayController = (() => {
 
   }
 
-  const player = (player, number) => {
-    document.querySelector(`.player${number} .player__name`).innerHTML = player.name;
-    document.querySelector(`.player${number} .player__mark`).innerHTML = player.mark;
-    document.querySelector(`.player${number} .player__score`).innerHTML = player.score;
+  const getBoard = (board) => {
+
+    let boardCells = {};
+
+    for (let row = 0 ; row < board.length ; row++) {
+      for (let column = 0 ; column < board.length ; column++) {
+        boardCells[`cell-${row}-${column}`] = document.querySelector(`[data-cell$="${row}-${column}"`);
+      }
+    }
+
+    return boardCells;
+
   }
 
-  const play = (player, row, column) => {
-    document.querySelector(`[data-cell$="${row}-${column}"`).classList.add(`mark--${player.mark}`, "mark");
-    
+  const _getPlayer = (num) => { 
+    return {
+      name: document.querySelector(`.player${num} .player__name`),
+      played: document.querySelector(`.player${num} .player__played`),
+      win: document.querySelector(`.player${num} .player__won`),
+      loss: document.querySelector(`.player${num} .player__lost`)
+    }
+  }
+  
+  const player1 = _getPlayer(1);
+  const player2 = _getPlayer(2);
+
+  const setName = (player, name) => {
+    player.name.innerHTML = name;
+  }
+
+  const setStats = (player, played, win, loss) => {
+    player.played.innerHTML = played;
+    player.win.innerHTML = win;
+    player.loss.innerHTML = loss;
+  }
+
+  const play = (board, row, column, player) => {
+    board[`cell-${row}-${column}`].classList.add(`mark--${player.mark}`, "mark");
   }
 
   const _resultElem = document.querySelector(".result");
@@ -116,13 +155,20 @@ const displayController = (() => {
     Click anywhere to start a new game.`
   }
 
-  const reset = () => {
-    document.querySelectorAll(".board__cell").forEach (cell => cell.innerHTML = "");
+  const reset = (board) => {
+    for (let cell of board) {
+      cell.innerHTML = "";
+      cell.classList.remove("mark--x", "mark--o");
+    }
   }
 
   return {
-    player,
-    board,
+    player1,
+    player2,
+    setName,
+    setStats,
+    setBoard,
+    getBoard,
     play,
     win,
     tie,
@@ -135,6 +181,7 @@ const displayController = (() => {
   - Initialize the game (board, players)
   - Start new rounds until a result is reached.
   - End the game when a result is reached.
+  - Restart the game if wanted.
 */
 
 const gamePlay = (() => {
@@ -142,52 +189,56 @@ const gamePlay = (() => {
   const player1 = player("Player1", "x");
   const player2 = player("Player2", "o");
   let currentPlayer = player1;
-  let latestPlay = {};
-  let randomMove;
-  let bestMove;
 
-  const gameInit = () => {
-    
-    //Render the empty board and players
-      displayController.board(gameBoard.board);
+  const boardInit = (size) => {
 
-    const cells = document.querySelectorAll(".board__cell");
-    cells.forEach( cell => cell.addEventListener("click", gameRound));
-    document.querySelector(".reset").addEventListener("click", _reset);
+    let board = gameBoard(size);
+    displayController.setBoard(board.board);
+    let boardElem = displayController.getBoard(board.board);
+
+    for (let cell in boardElem) {
+      boardElem[cell].addEventListener("click", () => gameRound(event, board, boardElem));
+    }
   }
 
-  const gameRound = (event) => {
+  const gameRound = (event, board, boardElem) => {
 
-    latestPlay = { 
+    let latestPlay = { 
       row : event.target.dataset.cell.split('-')[1],
       column : event.target.dataset.cell.split('-')[2]
     };
 
+    console.log(board.board);
     //If the cell chosen is already occupied, nothing is done until the player chooses an empty cell.
-    if (gameBoard.board[latestPlay.row][latestPlay.column] != "") return false;
+    if (board.board[latestPlay.row][latestPlay.column] != "") return false;
 
     //Add the player mark on the board array and displayed board.
-    currentPlayer.play(latestPlay.row, latestPlay.column);
-    displayController.play(currentPlayer, latestPlay.row, latestPlay.column);
+    currentPlayer.play(board.board, latestPlay.row, latestPlay.column);
+    displayController.play(boardElem, latestPlay.row, latestPlay.column, currentPlayer);
 
     //Checks for a win / tie : if there is one, the game ends.
-    if (gameChecks.checkVictory(gameBoard.board, currentPlayer)) {
+    if (gameChecks.checkVictory(board.board, currentPlayer)) {
       _win();
+      _end();
     }
 
-    if (gameChecks.checkTie(gameBoard)) {
+    if (gameChecks.checkTie(board)) {
       _tie();
+      _end();
     }
 
+    //It is now the other player's turn.
     _changePlayer(player1, player2);
 
     if (currentPlayer == player2 && gameSettings.mode == "computer") {
-      // randomMove = computer.randomMove(gameBoard.board);
-      // document.querySelector(`[data-cell="cell-${randomMove.row}-${randomMove.column}"`).dispatchEvent(new Event("click"));
 
-      bestMove = computer.bestMove(gameBoard.board);
-      document.querySelector(`[data-cell="cell-${bestMove.row}-${bestMove.column}"`).dispatchEvent(new Event("click"));
-
+      if (gameSettings.difficulty == "normal") {
+        let randomMove = computer.randomMove(board.board);
+        setTimeout( () => boardElem[`cell-${randomMove.row}-${randomMove.column}`].dispatchEvent(new Event("click")), 200);
+      } else {
+        let bestMove = computer.bestMove(board.board);
+        setTimeout( () => boardElem[`cell-${bestMove.row}-${bestMove.column}`].dispatchEvent(new Event("click")), 200);
+      }
     }
 
   }
@@ -202,7 +253,14 @@ const gamePlay = (() => {
   }
 
   const _tie = () => {
-    displayController.tie(currentPlayer);
+    displayController.tie();
+  }
+
+  const _end = () => {
+    player1.incPlay();
+    player2.incPlay();
+    displayController.setStats(displayController.player1, player1.played, player1.score, player1.played - player1.score);
+    displayController.setStats(displayController.player2, player2.played, player2.score, player2.played - player1.score);
   }
 
   const _reset = () => {
@@ -214,7 +272,7 @@ const gamePlay = (() => {
     player1,
     player2,
     gameRound,
-    gameInit
+    boardInit,
   };
 
 })();
@@ -284,20 +342,6 @@ const gameChecks = (() => {
 
 })();
 
-/*gameStats Module:
-  - Counts the number of game played / ties
-*/
-
-const gameStats = (() => {
-  const played = 0;
-  const tied = 0;
-
-  return {
-    played,
-    tied
-  }
-})();
-
 /*gameSettings:
   - Change the number of players (1 or 2?)
   - Change the computer difficulty (easy or hard)
@@ -306,14 +350,21 @@ const gameStats = (() => {
 const gameSettings = (() => {
 
   const mode = "computer";
+  const difficulty = "hard";
 
   const changeMode = function(mode) {
     mode = mode == "computer" ? "player" : "computer" ;
   }
 
+  const changeDifficulty = function(difficulty) {
+    difficulty = difficulty == "normal" ? "hard" : "normal" ;
+  }
+
   return {
     mode,
-    changeMode
+    changeMode,
+    difficulty,
+    changeDifficulty
   }
 
 })();
@@ -422,4 +473,4 @@ const computer = (() => {
 
 })();
 
-gamePlay.gameInit();
+gamePlay.boardInit(3);

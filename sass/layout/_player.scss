@@ -12,8 +12,21 @@
     border: 1px solid $color-secondary;
     border-radius: $border-radius;
     position: relative;
-    top: 1rem;
+    top: 2rem;
     z-index: 1;
+  }
+
+  &__type {
+    display: flex;
+  }
+
+  &__change {
+    margin: .5rem;
+  }
+
+  &__image {
+    width: 100px;
+    height: auto;
   }
 
   &__stats {
@@ -27,7 +40,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin: 0 2rem;
+    margin: 1rem 2rem 0 2rem;
 
     &--1 {
       background-image: url("../sass/assets/player1.png");

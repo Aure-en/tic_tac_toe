@@ -21,15 +21,18 @@
     <div class="main">
 
       <aside class="player player1">
+
+        <img class="player__image" src="sass/assets/person.png" alt="Character Icon">
+
         <h2 class="player__title">PLAYER 1</h2>
 
         <div class="player__stats player__stats--1 box">
           <ul>
-            <li class="player__name"><span class="stats">NAME:</span> Potato</i></li>
-            <li class="player__mark"><span class="stats">MARK:</span> X</li>
-            <li class="player__score"><span class="stats">PLAYED:</span> 10 games</li>
-            <li class="player__rate"><span class="stats">WON:</span> 5 games</li>
-            <li class="player__rate"><span class="stats">LOST:</span> 5 games</li>
+            <li><span class="stats">NAME: </span><span class="player__name">Player 1</span></li>
+            <li><span class="stats">MARK: </span><span class="player__mark">X</span></li>
+            <li><span class="stats">PLAYED: </span><span class="player__played">0</span> games</li>
+            <li><span class="stats">WON: </span><span class="player__won">0</span> games</li>
+            <li><span class="stats">LOST: </span><span class="player__lost">0</span> games</li>
           </ul>
           <i class="fas fa-pencil-alt"></i>
         </div>
@@ -43,15 +46,22 @@
       </main>
 
       <aside class="player player2">
+
+        <div class="player__type">
+          <button type="button" class="player__change"><i class="fas fa-caret-left"></i></button>
+          <img class="player__image" src="sass/assets/computer.png" alt="Computer Icon">
+          <button type="button" class="player__change"><i class="fas fa-caret-right"></i></button>
+        </div>
+
         <h2 class="player__title">PLAYER 2</h2>
 
         <div class="player__stats player__stats--2 box">
           <ul>
-            <li class="player__name"><span class="stats">NAME:</span> POTATO2</li>
-            <li class="player__mark"><span class="stats">MARK:</span> O</li>
-            <li class="player__score"><span class="stats">PLAYED:</span> 10 GAMES</li>
-            <li class="player__rate"><span class="stats">WON:</span> 5 GAMES</li>
-            <li class="player__rate"><span class="stats">LOST:</span> 5 GAMES</li>
+            <li><span class="stats">NAME: </span><span class="player__name">Player 2</span></li>
+            <li><span class="stats">MARK: </span><span class="player__mark">O</span></li>
+            <li><span class="stats">PLAYED: </span><span class="player__played">0</span> games</li>
+            <li><span class="stats">WON: </span><span class="player__won">0</span> games</li>
+            <li><span class="stats">LOST: </span><span class="player__lost">0</span> games</li>
           </ul>
           <i class="fas fa-pencil-alt"></i>
         </div>

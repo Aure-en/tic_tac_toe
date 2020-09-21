@@ -82,6 +82,10 @@ body {
   align-items: flex-end;
 }
 
+button {
+  background: none;
+  cursor: pointer;
+}
 button:focus {
   outline: none;
 }
@@ -101,13 +105,17 @@ a {
 .player {
   letter-spacing: -0.5px;
 }
+.player__change {
+  font-size: 1.5rem;
+  color: #83a870;
+}
 
 .stats {
   display: inline-block;
   background: rgba(117, 158, 96, 0.8);
   color: #fcf9f7;
-  padding: 0.25rem 0.45rem 0.25rem 0.35rem;
-  margin: 0.25rem 0.15rem;
+  padding: 0.35rem;
+  margin: 0.25rem 0.35rem;
   font-weight: 400;
   text-transform: uppercase;
 }
@@ -184,11 +192,17 @@ a {
   background-repeat: no-repeat;
   background-position: center;
 }
+.mark--hover--x {
+  background-image: url("../sass/assets/X.png");
+  opacity: 0.2;
+}
 .mark--x {
   background-image: url("../sass/assets/X.png");
+  opacity: 1;
 }
 .mark--o {
   background-image: url("../sass/assets/O.png");
+  opacity: 1;
 }
 
 .player {
@@ -204,8 +218,18 @@ a {
   border: 1px solid #fcf9f7;
   border-radius: 15px 2.5px;
   position: relative;
-  top: 1rem;
+  top: 2rem;
   z-index: 1;
+}
+.player__type {
+  display: flex;
+}
+.player__change {
+  margin: 0.5rem;
+}
+.player__image {
+  width: 100px;
+  height: auto;
 }
 .player__stats {
   width: 25vh;
@@ -217,7 +241,7 @@ a {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin: 0 2rem;
+  margin: 1rem 2rem 0 2rem;
 }
 .player__stats--1 {
   background-image: url("../sass/assets/player1.png");
