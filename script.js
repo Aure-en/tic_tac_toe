@@ -100,13 +100,14 @@ const displayController = (() => {
   }
 
   const play = (player, row, column) => {
-    document.querySelector(`[data-cell$="${row}-${column}"`).innerHTML = player.mark;
+    document.querySelector(`[data-cell$="${row}-${column}"`).classList.add(`mark--${player.mark}`, "mark");
+    
   }
 
   const _resultElem = document.querySelector(".result");
 
   const win = (currentPlayer) => {
-    _resultElem.innerHTML = `${currentPlayer.name} won the game.
+    _resultElem.innerHTML = `${currentPlayer.name} won the game.<br>
     Click anywhere to start a new game.`
   }
 
