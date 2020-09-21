@@ -1,9 +1,9 @@
 "use strict"
 
 /*gameBoard Factory:
-  - Create the board
+  - Create the board array
   - Check its state: is it full? Is a cell empty?
-  - Reset the board
+  - Reset the board array
 */
 
 const gameBoard = (size) => {
@@ -57,8 +57,8 @@ const player = (name, mark) => {
       board[row][column] = mark;
   }
 
-  const win = function() { ++score };
-  const incPlay = function () { ++played };
+  const win = function() { ++this.score };
+  const incPlay = function () { ++this.played };
 
   const setName = function(name) {
     this.name = name;
@@ -78,7 +78,7 @@ const player = (name, mark) => {
 
 /*displayController Module:
   - Setups the buttons
-  - Display the board, players, results on the DOM.
+  - Display the board, players, results.
   - Modify the DOM board when a player plays.
 */
 
@@ -208,7 +208,6 @@ const gamePlay = (() => {
       column : event.target.dataset.cell.split('-')[2]
     };
 
-    console.log(board.board);
     //If the cell chosen is already occupied, nothing is done until the player chooses an empty cell.
     if (board.board[latestPlay.row][latestPlay.column] != "") return false;
 
@@ -240,7 +239,6 @@ const gamePlay = (() => {
         setTimeout( () => boardElem[`cell-${bestMove.row}-${bestMove.column}`].dispatchEvent(new Event("click")), 200);
       }
     }
-
   }
 
   const _changePlayer = () => {
@@ -263,9 +261,9 @@ const gamePlay = (() => {
     displayController.setStats(displayController.player2, player2.played, player2.score, player2.played - player1.score);
   }
 
-  const _reset = () => {
-    gameBoard.reset();
-    displayController.reset();
+  const reset = (board) => {
+    board.reset();
+    displayController.reset(board);
   }
     
   return {
@@ -273,6 +271,7 @@ const gamePlay = (() => {
     player2,
     gameRound,
     boardInit,
+    reset
   };
 
 })();
@@ -350,14 +349,14 @@ const gameChecks = (() => {
 const gameSettings = (() => {
 
   const mode = "computer";
-  const difficulty = "hard";
+  const difficulty = "normal";
 
-  const changeMode = function(mode) {
-    mode = mode == "computer" ? "player" : "computer" ;
+  const changeMode = function() {
+    this.mode = this.mode == "computer" ? "player" : "computer" ;
   }
 
-  const changeDifficulty = function(difficulty) {
-    difficulty = difficulty == "normal" ? "hard" : "normal" ;
+  const changeDifficulty = function() {
+    this.difficulty = this.difficulty == "normal" ? "hard" : "normal" ;
   }
 
   return {
@@ -404,7 +403,7 @@ const computer = (() => {
 
   const bestMove = (board) => {
 
-    return _minimax(gameBoard.board, gamePlay.player2);
+    return _minimax(board, gamePlay.player2);
 
   }
 
@@ -473,4 +472,42 @@ const computer = (() => {
 
 })();
 
+const settings = (() => {
+
+  const _changePlayer = () => {
+    _changeImage();
+    gameSettings.changeMode();
+  }
+
+  const _changeImage = () => {
+
+    let playerImage = document.querySelector(".player2 .player__image");
+
+    if (playerImage.alt == "Character Icon") {
+      playerImage.src = "sass/assets/computer.png";
+      playerImage.alt = "Computer Icon";
+    } else {
+      playerImage.src = "sass/assets/person.png";
+      playerImage.alt = "Character Icon";
+    }
+    
+  }
+
+  const changePlayerBtn = () => {
+    document.querySelectorAll(".player__change").forEach(button => button.addEventListener("click", _changePlayer));
+  }
+
+  const resetBtn = () => {
+    document.querySelector(".reset").addEventListener("click", gamePlay.reset);
+  }
+
+  return {
+    resetBtn,
+    changePlayerBtn
+  }
+
+})();
+
+settings.resetBtn();
+settings.changePlayerBtn();
 gamePlay.boardInit(3);
