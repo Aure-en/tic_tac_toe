@@ -17,7 +17,6 @@ a {
     font-size: 1.5rem;
     color: $color-primary;
   }
-
 }
 
 .stats {
@@ -34,4 +33,29 @@ a {
   text-transform: uppercase;
   font-size: 0.75rem;
   color: lighten($color-font, 10%);
+}
+
+small {
+  font-size: 0.85rem;
+  color: darken($color-primary, 15%);
+}
+
+.settings__apply {
+  font-size: 0.85rem;
+}
+
+input,
+select {
+  font-family: $font-family;
+  font-size: 1rem;
+}
+
+label {
+  text-transform: uppercase;
+  font-size: 0.85rem;
+}
+
+.close {
+  color: $color-primary;
+  font-size: 1.25rem;
 }

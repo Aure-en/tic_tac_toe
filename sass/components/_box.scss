@@ -4,3 +4,13 @@
   background: $color-secondary;
   box-shadow: 3px 3px 1px $color-secondary, -3px -3px 1px $color-secondary, 3px -3px 1px $color-secondary, -3px 3px 1px $color-secondary;
 }
+
+.title {
+  color: $color-secondary;
+  background: lighten($color-primary, 5%);
+  padding: .55rem 1.25rem;
+  border: 1px solid $color-secondary;
+  border-radius: $border-radius;
+  position: relative;
+  z-index: 1;
+}

@@ -472,7 +472,51 @@ const computer = (() => {
 
 })();
 
+/*settings Module:
+  - Make the buttons work
+  - Make the settings menu work
+*/
+
 const settings = (() => {
+
+  const openSettingsBtn = () => {
+    document.querySelector('[data-toggle="settings"]').addEventListener("click", () => {
+      document.querySelector(".settings").classList.toggle("hidden");
+    })
+  }
+
+  const closeSettingsBtn = () => {
+    document.querySelector(".close").addEventListener("click", () => {
+      document.querySelector(".settings").classList.add("hidden");
+    })
+  }
+
+  const applySettingsBtn = () => {
+    document.querySelector(".settings__apply").addEventListener("click", _applySettings);
+  }
+
+  const _applySettings = () => {
+    _changeName(1);
+    _changeName(2);
+    _changeDifficulty();
+  }
+
+  const _changeName = (num) => {
+    const newName = document.querySelector(`#player${num}_name`);
+
+    if (newName.value != "") {
+      gamePlay[`player${num}`].name = newName.value;
+      displayController.setName(displayController[`player${num}`], newName.value);
+    }
+  }
+
+  const _changeDifficulty = () => {
+    const newDifficulty = document.querySelector("#difficulty");
+
+    if (gameSettings.difficulty != newDifficulty.value) {
+      gameSettings.difficulty = newDifficulty.value;
+    }
+  }
 
   const _changePlayer = () => {
     _changeImage();
@@ -490,7 +534,6 @@ const settings = (() => {
       playerImage.src = "sass/assets/person.png";
       playerImage.alt = "Character Icon";
     }
-    
   }
 
   const changePlayerBtn = () => {
@@ -498,16 +541,25 @@ const settings = (() => {
   }
 
   const resetBtn = () => {
-    document.querySelector(".reset").addEventListener("click", gamePlay.reset);
+    document.querySelector(".reset").addEventListener("click", () => gamePlay.reset);
   }
 
   return {
     resetBtn,
-    changePlayerBtn
+    changePlayerBtn,
+    openSettingsBtn,
+    closeSettingsBtn,
+    applySettingsBtn
   }
 
 })();
 
 settings.resetBtn();
 settings.changePlayerBtn();
+settings.openSettingsBtn();
+settings.closeSettingsBtn();
+settings.applySettingsBtn();
+
 gamePlay.boardInit(3);
+
+document.querySelector(".player1 .player__name").addEventListener("dblclick", () => console.log(1));

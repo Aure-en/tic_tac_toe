@@ -24,17 +24,16 @@
 
         <img class="player__image" src="sass/assets/person.png" alt="Character Icon">
 
-        <h2 class="player__title">PLAYER 1</h2>
+        <h2 class="player__title title">PLAYER 1</h2>
 
         <div class="player__stats player__stats--1 box">
           <ul>
             <li><span class="stats">NAME: </span><span class="player__name">Player 1</span></li>
             <li><span class="stats">MARK: </span><span class="player__mark">X</span></li>
-            <li><span class="stats">PLAYED: </span><span class="player__played">0</span> games</li>
-            <li><span class="stats">WON: </span><span class="player__won">0</span> games</li>
-            <li><span class="stats">LOST: </span><span class="player__lost">0</span> games</li>
+            <li><span class="stats">PLAYED: </span><span class="player__played">0</span></li>
+            <li><span class="stats">WON: </span><span class="player__won">0</span></li>
+            <li><span class="stats">LOST: </span><span class="player__lost">0</span></li>
           </ul>
-          <i class="fas fa-pencil-alt"></i>
         </div>
 
       </aside>
@@ -53,17 +52,16 @@
           <button type="button" class="player__change"><i class="fas fa-caret-right"></i></button>
         </div>
 
-        <h2 class="player__title">PLAYER 2</h2>
+        <h2 class="player__title title">PLAYER 2</h2>
 
         <div class="player__stats player__stats--2 box">
           <ul>
             <li><span class="stats">NAME: </span><span class="player__name">Player 2</span></li>
             <li><span class="stats">MARK: </span><span class="player__mark">O</span></li>
-            <li><span class="stats">PLAYED: </span><span class="player__played">0</span> games</li>
-            <li><span class="stats">WON: </span><span class="player__won">0</span> games</li>
-            <li><span class="stats">LOST: </span><span class="player__lost">0</span> games</li>
+            <li><span class="stats">PLAYED: </span><span class="player__played">0</span></li>
+            <li><span class="stats">WON: </span><span class="player__won">0</span></li>
+            <li><span class="stats">LOST: </span><span class="player__lost">0</span></li>
           </ul>
-          <i class="fas fa-pencil-alt"></i>
         </div>
 
       </aside>
@@ -73,8 +71,41 @@
     <nav class="links">
       <button type="button" class="btn reset"><div class="icon"><i class="fas fa-eraser"></i></div>Reset</button>
       <a href="https://github.com/Aure-en/tic_tac_toe" class="btn"><div class="icon"><i class="fab fa-github"></div></i>Repository</a>
-      <button type="button" class="btn reset"><div class="icon"><i class="fas fa-cog"></i></div>Settings</button>
+      <button type="button" class="btn" data-toggle="settings"><div class="icon"><i class="fas fa-cog"></i></div>Settings</button>
     </nav>
+
+    <div class="settings box hidden">
+
+      <h2 class="settings__title title">SETTINGS</h2>
+
+      <button type="button" class="close"><i class="fas fa-times"></i></button>
+
+      <form class="settings__form">
+
+        <label for="player1_name">Player 1 - Name</label>
+        <input type="text" id="player1_name" name="name">
+        
+
+        <label for="player2_name">Player 2 - Name</label>
+        <input type="text" id="player2_name" name="name">
+        
+
+        <label for="board_size">Board's size</label>
+        <input id="board_size" type="number" min="3" max="10" value="3">
+        
+
+        <label for="difficulty">Computer's Level</label>
+        <select id="difficulty" name="level">
+          <option value="normal">Normal</option>
+          <option value="hard">Hard</option>
+        </select>
+        <small>Unfortunately, the Hard Difficulty is only available on the 3x3 board.</small>
+
+        <button type="button" class="title settings__apply">APPLY</button>
+
+      </form>
+
+    </div>
 
   </div>
 

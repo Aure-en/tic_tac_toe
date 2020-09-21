@@ -86,3 +86,30 @@ button {
 		outline: none;
 	}
 }
+
+[contentEditable=true]:focus {
+	display: inline-block;
+	border: $border-primary;
+	outline: none;
+	background: $color-secondary;
+	padding: .25rem .25rem .25rem 0;
+}
+
+input,
+select {
+	border: 1px solid lighten($color-primary, 10%);
+	background: $color-secondary;
+	padding: .15rem .25rem;
+
+	&:focus {
+		outline: none;
+	}
+}
+
+label {
+	margin: 1rem 0 .15rem 0;
+}
+
+.hidden {
+	display: none;
+}

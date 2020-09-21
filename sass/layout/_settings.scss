@@ -1,0 +1,26 @@
+.settings {
+  position: absolute;
+  max-width: 250px;
+  height: 400px;
+  padding: 0 2.5rem;
+
+  &__title {
+    top: -1rem;
+    text-align: center;
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    height: 80%;
+    margin-top: .75rem;
+  }
+
+  &__apply {
+    border-radius: 5px;
+    align-self: center;
+    margin: 1rem;
+  }
+
+}
