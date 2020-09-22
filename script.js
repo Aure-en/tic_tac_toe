@@ -196,7 +196,7 @@ const gamePlay = (() => {
     let boardElem = displayController.getBoard(board.board);
 
     for (let cell in boardElem) {
-      boardElem[cell].addEventListener("click", () => gameRound(event, board, boardElem));
+      boardElem[cell].addEventListener("click", (event) => gameRound(event, board, boardElem));
     }
 
     return { board, boardElem };
@@ -207,12 +207,14 @@ const gamePlay = (() => {
 
   const gameRound = (event, board, boardElem) => {
 
+    if (gameChecks.checkVictory(board.board, player1) || gameChecks.checkVictory(board.board, player2) || gameChecks.checkTie(board)) {
+      gamePlay.reset(gamePlay.board);
+    }
+
     let latestPlay = { 
       row : event.target.dataset.cell.split('-')[1],
       column : event.target.dataset.cell.split('-')[2]
     };
-
-    console.log(latestPlay);
 
     //If the cell chosen is already occupied, nothing is done until the player chooses an empty cell.
     if (board.board[latestPlay.row][latestPlay.column] != "") return false;
@@ -227,7 +229,7 @@ const gamePlay = (() => {
       _end();
     }
 
-    if (gameChecks.checkTie(board)) {
+    else if (gameChecks.checkTie(board)) {
       _tie();
       _end();
     }
@@ -237,12 +239,17 @@ const gamePlay = (() => {
 
     if (currentPlayer == player2 && settings.mode == "computer") {
 
+      if (gameChecks.checkVictory(board.board, player1) || gameChecks.checkVictory(board.board, player2) || gameChecks.checkTie(board)) {
+        setTimeout( () => boardElem[`cell-${Math.floor(Math.random() * gamePlay.board.board.board.length)}-${Math.floor(Math.random() * gamePlay.board.board.board.length)}`].dispatchEvent(new Event("click")), 300);
+        return false;
+      }
+
       if (settings.difficulty == "normal") {
         let randomMove = computer.randomMove(board.board);
-        setTimeout( () => boardElem[`cell-${randomMove.row}-${randomMove.column}`].dispatchEvent(new Event("click")), 200);
+        setTimeout( () => boardElem[`cell-${randomMove.row}-${randomMove.column}`].dispatchEvent(new Event("click")), 300);
       } else {
         let bestMove = computer.bestMove(board.board);
-        setTimeout( () => boardElem[`cell-${bestMove.row}-${bestMove.column}`].dispatchEvent(new Event("click")), 200);
+        setTimeout( () => boardElem[`cell-${bestMove.row}-${bestMove.column}`].dispatchEvent(new Event("click")), 300);
       }
     }
   }
@@ -459,7 +466,7 @@ const computer = (() => {
 
 const settings = (() => {
 
-  let mode = "human";
+  let mode = "player";
   let difficulty = "normal";
 
   const _changeMode = function() {
