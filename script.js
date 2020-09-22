@@ -52,12 +52,14 @@ const player = (name, mark) => {
 
   let score = 0;
   let played = 0;
+  let lost = 0;
 
   const play = (board, row, column) => {
       board[row][column] = mark;
   }
 
   const win = function() { ++this.score };
+  const lose = function() { ++this.lost };
   const incPlay = function () { ++this.played };
 
   const setName = function(name) {
@@ -70,7 +72,9 @@ const player = (name, mark) => {
     score,
     play,
     win,
+    lose,
     played,
+    lost,
     incPlay,
     setName
   };
@@ -261,7 +265,15 @@ const gamePlay = (() => {
 
   const _win = () => {
     currentPlayer.win();
+
+    if (currentPlayer == gamePlay.player1) {
+      gamePlay.player2.lose();
+    } else {
+      gamePlay.player1.lose();
+    }
+
     displayController.win(currentPlayer);
+    
   }
 
   const _tie = () => {
@@ -271,8 +283,8 @@ const gamePlay = (() => {
   const _end = () => {
     player1.incPlay();
     player2.incPlay();
-    displayController.setStats(displayController.player1, player1.played, player1.score, player1.played - player1.score);
-    displayController.setStats(displayController.player2, player2.played, player2.score, player2.played - player1.score);
+    displayController.setStats(displayController.player1, player1.played, player1.score, player1.lost);
+    displayController.setStats(displayController.player2, player2.played, player2.score, player2.lost);
   }
 
   const reset = (board) => {
