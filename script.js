@@ -186,7 +186,7 @@ const displayController = (() => {
   - End the game when a result is reached and start a new game.
 */
 
-const gamePlay = (() => {
+const gamePlay = (() => { 
 
   const player1 = player("Player1", "x");
   const player2 = player("Player2", "o");
@@ -229,7 +229,7 @@ const gamePlay = (() => {
     displayController.play(boardElem, latestPlay.row, latestPlay.column, gamePlay.currentPlayer);
 
     //Checks for a win / tie : if there is one, the game ends.
-    if (gameChecks.checkVictory(board.board, currentPlayer)) {
+    if (gameChecks.checkVictory(board.board, gamePlay.currentPlayer)) {
       _win();
       _end();
     }
@@ -244,11 +244,13 @@ const gamePlay = (() => {
 
     if (gamePlay.currentPlayer == player2 && settings.mode == "computer") {
 
+      //If the game has just started, the computer will just pick a random cell.
       if (gameChecks.checkVictory(board.board, player1) || gameChecks.checkVictory(board.board, player2) || gameChecks.checkTie(board)) {
         setTimeout( () => boardElem[`cell-${Math.floor(Math.random() * gamePlay.board.board.board.length)}-${Math.floor(Math.random() * gamePlay.board.board.board.length)}`].dispatchEvent(new Event("click")), 300);
         return false;
       }
 
+      //If the difficulty is "normal", the computer picks a random cell. Otherwise, he picks the optimal cell.
       if (settings.difficulty == "normal") {
         let randomMove = computer.randomMove(board.board);
         setTimeout( () => boardElem[`cell-${randomMove.row}-${randomMove.column}`].dispatchEvent(new Event("click")), 300);
@@ -264,16 +266,16 @@ const gamePlay = (() => {
   }
 
   const _win = () => {
-    currentPlayer.win();
+    gamePlay.currentPlayer.win();
 
-    if (currentPlayer == gamePlay.player1) {
+    if (gamePlay.currentPlayer == gamePlay.player1) {
       gamePlay.player2.lose();
     } else {
       gamePlay.player1.lose();
     }
 
-    displayController.win(currentPlayer);
-    
+    displayController.win(gamePlay.currentPlayer);
+
   }
 
   const _tie = () => {
@@ -398,7 +400,7 @@ const computer = (() => {
       column = Math.floor(Math.random() * board.length);
     }
 
-    return { row, column };
+    setTimeout( () => gamePlay.board.boardElem[`cell-${row}-${column}`].dispatchEvent(new Event("click")), 300);
 
   } 
 
@@ -480,7 +482,7 @@ const computer = (() => {
 
 const settings = (() => {
 
-  let mode = "player";
+  let mode = "computer";
   let difficulty = "normal";
 
   const _changeMode = function() {
