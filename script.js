@@ -156,9 +156,8 @@ const displayController = (() => {
   }
 
   const reset = (board) => {
-    for (let cell of board) {
-      cell.innerHTML = "";
-      cell.classList.remove("mark--x", "mark--o");
+    for (let cell in board) {
+      board[cell].classList.remove("mark--x", "mark--o");
     }
   }
 
@@ -199,7 +198,12 @@ const gamePlay = (() => {
     for (let cell in boardElem) {
       boardElem[cell].addEventListener("click", () => gameRound(event, board, boardElem));
     }
+
+    return { board, boardElem };
+
   }
+
+  let board = boardInit(3);
 
   const gameRound = (event, board, boardElem) => {
 
@@ -207,6 +211,8 @@ const gamePlay = (() => {
       row : event.target.dataset.cell.split('-')[1],
       column : event.target.dataset.cell.split('-')[2]
     };
+
+    console.log(latestPlay);
 
     //If the cell chosen is already occupied, nothing is done until the player chooses an empty cell.
     if (board.board[latestPlay.row][latestPlay.column] != "") return false;
@@ -229,9 +235,9 @@ const gamePlay = (() => {
     //It is now the other player's turn.
     _changePlayer(player1, player2);
 
-    if (currentPlayer == player2 && gameSettings.mode == "computer") {
+    if (currentPlayer == player2 && settings.mode == "computer") {
 
-      if (gameSettings.difficulty == "normal") {
+      if (settings.difficulty == "normal") {
         let randomMove = computer.randomMove(board.board);
         setTimeout( () => boardElem[`cell-${randomMove.row}-${randomMove.column}`].dispatchEvent(new Event("click")), 200);
       } else {
@@ -262,11 +268,12 @@ const gamePlay = (() => {
   }
 
   const reset = (board) => {
-    board.reset();
-    displayController.reset(board);
+    board.board.reset();
+    displayController.reset(board.boardElem);
   }
     
   return {
+    board,
     player1,
     player2,
     gameRound,
@@ -337,33 +344,6 @@ const gameChecks = (() => {
   return {
     checkTie,
     checkVictory
-  }
-
-})();
-
-/*gameSettings:
-  - Change the number of players (1 or 2?)
-  - Change the computer difficulty (easy or hard)
-*/
-
-const gameSettings = (() => {
-
-  const mode = "computer";
-  const difficulty = "normal";
-
-  const changeMode = function() {
-    this.mode = this.mode == "computer" ? "player" : "computer" ;
-  }
-
-  const changeDifficulty = function() {
-    this.difficulty = this.difficulty == "normal" ? "hard" : "normal" ;
-  }
-
-  return {
-    mode,
-    changeMode,
-    difficulty,
-    changeDifficulty
   }
 
 })();
@@ -479,6 +459,13 @@ const computer = (() => {
 
 const settings = (() => {
 
+  let mode = "human";
+  let difficulty = "normal";
+
+  const _changeMode = function() {
+    settings.mode = settings.mode == "computer" ? "player" : "computer" ;
+  }
+
   const openSettingsBtn = () => {
     document.querySelector('[data-toggle="settings"]').addEventListener("click", () => {
       document.querySelector(".settings").classList.toggle("hidden");
@@ -498,6 +485,7 @@ const settings = (() => {
   const _applySettings = () => {
     _changeName(1);
     _changeName(2);
+    _changeSize();
     _changeDifficulty();
   }
 
@@ -510,17 +498,37 @@ const settings = (() => {
     }
   }
 
+  const _changeSize = () => {
+    const newSize = document.querySelector("#board_size");
+
+    if (newSize.value != gamePlay.board.board.board.length) {
+      gamePlay.board = gamePlay.boardInit(+newSize.value);
+    }
+
+    //Minimax takes too long when the board is bigger than 3x3, so it is disabled.
+    if (settings.difficulty == "hard") {
+      settings.difficulty = "normal";
+    }
+
+  }
+
   const _changeDifficulty = () => {
     const newDifficulty = document.querySelector("#difficulty");
 
-    if (gameSettings.difficulty != newDifficulty.value) {
-      gameSettings.difficulty = newDifficulty.value;
+    if (settings.difficulty != newDifficulty.value) {
+      settings.difficulty = newDifficulty.value;
     }
+
+    //Minimax takes too long when the board is bigger than 3x3, so it is disabled.
+    if (gamePlay.board.board.board.length > 3) {
+      settings.difficulty = "normal";
+    }
+
   }
 
   const _changePlayer = () => {
     _changeImage();
-    gameSettings.changeMode();
+    _changeMode();
   }
 
   const _changeImage = () => {
@@ -541,15 +549,18 @@ const settings = (() => {
   }
 
   const resetBtn = () => {
-    document.querySelector(".reset").addEventListener("click", () => gamePlay.reset);
+    document.querySelector(".reset").addEventListener("click", () => gamePlay.reset(gamePlay.board));
   }
 
   return {
+    mode,
+    difficulty,
     resetBtn,
     changePlayerBtn,
     openSettingsBtn,
     closeSettingsBtn,
-    applySettingsBtn
+    applySettingsBtn,
+    _changeDifficulty
   }
 
 })();
@@ -559,7 +570,3 @@ settings.changePlayerBtn();
 settings.openSettingsBtn();
 settings.closeSettingsBtn();
 settings.applySettingsBtn();
-
-gamePlay.boardInit(3);
-
-document.querySelector(".player1 .player__name").addEventListener("dblclick", () => console.log(1));
