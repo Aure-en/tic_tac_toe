@@ -79,7 +79,7 @@ const player = (name, mark) => {
 /*displayController Module:
   - Setups the buttons
   - Display the board, players, results.
-  - Modify the DOM board when a player plays.
+  - Modify the displayed board when a player plays.
 */
 
 const displayController = (() => {
@@ -179,8 +179,7 @@ const displayController = (() => {
 /*gamePlay Module (handles the game flow):
   - Initialize the game (board, players)
   - Start new rounds until a result is reached.
-  - End the game when a result is reached.
-  - Restart the game if wanted.
+  - End the game when a result is reached and start a new game.
 */
 
 const gamePlay = (() => {
@@ -207,21 +206,23 @@ const gamePlay = (() => {
 
   const gameRound = (event, board, boardElem) => {
 
+    //If the game ended, the board is reset before the next play.
     if (gameChecks.checkVictory(board.board, player1) || gameChecks.checkVictory(board.board, player2) || gameChecks.checkTie(board)) {
       gamePlay.reset(gamePlay.board);
     }
 
+    //The player chooses a celL.
     let latestPlay = { 
       row : event.target.dataset.cell.split('-')[1],
       column : event.target.dataset.cell.split('-')[2]
     };
 
-    //If the cell chosen is already occupied, nothing is done until the player chooses an empty cell.
+    //If the cell chosen is already occupied, nothing happens until the player chooses an empty cell.
     if (board.board[latestPlay.row][latestPlay.column] != "") return false;
 
     //Add the player mark on the board array and displayed board.
-    currentPlayer.play(board.board, latestPlay.row, latestPlay.column);
-    displayController.play(boardElem, latestPlay.row, latestPlay.column, currentPlayer);
+    gamePlay.currentPlayer.play(board.board, latestPlay.row, latestPlay.column);
+    displayController.play(boardElem, latestPlay.row, latestPlay.column, gamePlay.currentPlayer);
 
     //Checks for a win / tie : if there is one, the game ends.
     if (gameChecks.checkVictory(board.board, currentPlayer)) {
@@ -237,7 +238,7 @@ const gamePlay = (() => {
     //It is now the other player's turn.
     _changePlayer(player1, player2);
 
-    if (currentPlayer == player2 && settings.mode == "computer") {
+    if (gamePlay.currentPlayer == player2 && settings.mode == "computer") {
 
       if (gameChecks.checkVictory(board.board, player1) || gameChecks.checkVictory(board.board, player2) || gameChecks.checkTie(board)) {
         setTimeout( () => boardElem[`cell-${Math.floor(Math.random() * gamePlay.board.board.board.length)}-${Math.floor(Math.random() * gamePlay.board.board.board.length)}`].dispatchEvent(new Event("click")), 300);
@@ -255,7 +256,7 @@ const gamePlay = (() => {
   }
 
   const _changePlayer = () => {
-    currentPlayer = currentPlayer == player1 ? player2 : player1;
+    gamePlay.currentPlayer = gamePlay.currentPlayer == player1 ? player2 : player1;
   }
 
   const _win = () => {
@@ -283,6 +284,7 @@ const gamePlay = (() => {
     board,
     player1,
     player2,
+    currentPlayer,
     gameRound,
     boardInit,
     reset
@@ -471,6 +473,22 @@ const settings = (() => {
 
   const _changeMode = function() {
     settings.mode = settings.mode == "computer" ? "player" : "computer" ;
+
+    if (gamePlay.currentPlayer == gamePlay.player2 && settings.mode == "computer") {
+
+      if (gameChecks.checkVictory(gamePlay.board.board, gamePlay.player1) || gameChecks.checkVictory(gamePlay.board.board, gamePlay.player2) || gameChecks.checkTie(gamePlay.board)) {
+        setTimeout( () => gamePlay.board.boardElem[`cell-${Math.floor(Math.random() * gamePlay.board.board.board.length)}-${Math.floor(Math.random() * gamePlay.board.board.board.length)}`].dispatchEvent(new Event("click")), 300);
+        return false;
+      }
+
+      if (settings.difficulty == "normal") {
+        let randomMove = computer.randomMove(gamePlay.board.board);
+        setTimeout( () => gamePlay.board.boardElem[`cell-${randomMove.row}-${randomMove.column}`].dispatchEvent(new Event("click")), 300);
+      } else {
+        let bestMove = computer.bestMove(gamePlay.board.board);
+        setTimeout( () => gamePlay.board.boardElem[`cell-${bestMove.row}-${bestMove.column}`].dispatchEvent(new Event("click")), 300);
+      }
+    }
   }
 
   const openSettingsBtn = () => {
